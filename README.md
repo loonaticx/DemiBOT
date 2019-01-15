@@ -1,1 +1,34 @@
 # DemiBOT
+
+DemiBOT is an amazing remote control Discord bot, created by the infamous Loonatic and Disyer.
+
+# Features
+![alt text](http://i.loony.pw/2019-01-14_19-43-38.gif "Epic Screenshotting Feature!")
+![alt text](http://i.loony.pw/Discord_2019-01-14_19-44-58.png "Playing Overwatch")
+![alt text](http://i.loony.pw/Discord_2019-01-14_19-45-23.png "System Information")
+![alt text](http://i.loony.pw/Discord_2019-01-14_19-47-49.png "Help")
+
+# Dependencies:
+* Gradle
+* JDA
+* json.org for Java
+
+# Instructions
+* If you're using IntelliJ, be sure to select the option to import dependencies from Gradle.
+* Compile Gradle with the listed Dependencies
+* Plug in your bot's token in /config/botconfig.json
+* Run "Main"
+* Enjoy!
+
+Run ";help" for help.
+
+* Compiling Instructions
+After installing gradle and initializing it to the project, you should have a build.gradle file that should include this:
+
+dependencies {
+    compile 'net.dv8tion:JDA:3.5.1_347'
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+    compile group: 'org.json', name: 'json', version: '20180813'
+}
+
+I've also listed an example build.gradle with this repo.
