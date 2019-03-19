@@ -32,3 +32,14 @@ dependencies {
 }
 
 I've also listed an example build.gradle with this repo.
+
+# Compiling as JAR file
+DemiBOT can also be compiled as a standalone JAR file.
+
+However, if you decide to go this route, you will need to supply the ffmpeg, wget and nircmd binaries alongside the JAR file.
+
+First, install [Gradle 5.2.1](https://gradle.org/next-steps/?version=5.2.1&format=bin) and add Gradle's bin folder into your PATH environment variable.
+
+Then, run this command to build your JAR file: `gradle fatjar`
+
+The artifacts can then be copied from the `build/libs` folder.
