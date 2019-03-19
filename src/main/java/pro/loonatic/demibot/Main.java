@@ -17,6 +17,7 @@ import static pro.loonatic.demibot.Config.getBotToken;
 public class Main {
     public static JDA jda;
     public static void main(String...args) {
+        //System.out.println(System.getProperty("os.name")); // Windows 10 if this contains "Windows" or "windows"
         Config.loadConfig();
         try {
             jda = new JDABuilder(AccountType.BOT)

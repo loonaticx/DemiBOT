@@ -24,10 +24,10 @@ public class Config {
     public static String getBotToken() {
         return botToken;
     }
-
     public static boolean hasBotToken() {
         return botToken != null && !botToken.equals(DEFAULT_BOT_TOKEN);
     }
+
 
     public static String readFile(String path) {
         try {

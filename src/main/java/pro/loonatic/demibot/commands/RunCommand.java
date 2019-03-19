@@ -9,7 +9,6 @@ import java.util.List;
 public class RunCommand implements Command {
     public void process(MessageReceivedEvent event, List<String> args) throws Exception {
         Robot robot = new Robot();
-
         try {
             ProcessBuilder pb = new ProcessBuilder(args);
             pb.start();

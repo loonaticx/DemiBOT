@@ -9,7 +9,9 @@ public class CommandManager {
     private static Map<String, Command> commands = new HashMap<String, Command>();
     static {
         addCommand("ss", new ScreenshotCommand());
+        addCommand("rs", new RecordCommand());
         addCommand("run", new RunCommand());
+        addCommand("cmd", new CmdCommand());
         addCommand("ping", new PingCommand());
         addCommand("leftclick", new LeftClickCommand());
         addCommand("lc", new LeftClickCommand());
