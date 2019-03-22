@@ -13,6 +13,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.*;
 
+import static pro.loonatic.demibot.CommandUtils.*;
+
 public class CmdCommand implements Command {
 
 
@@ -20,8 +22,15 @@ public class CmdCommand implements Command {
         MessageChannel channel = event.getChannel();
         Robot robot = new Robot();
         List<String> commands = new ArrayList<String>();
-        commands.add("cmd.exe");
-        commands.add("/c");
+        if(isWindows) {
+            commands.add("cmd.exe");
+            commands.add("/c");
+        } else if (isLinux || isSolaris || isMac) {
+            commands.add("/bin/bash");
+            commands.add("-c");
+        }
+
+
         CommandUtils utils = new CommandUtils();
 
         try {
