@@ -28,13 +28,32 @@ import java.util.function.Consumer;
 
 public class CommandUtils {
 
-    public final String OpSystem = System.getProperty("os.name");
-    public final boolean isWindows = System.getProperty("os.name").toLowerCase().contains("win");
-    public final boolean isLinux = System.getProperty("os.name").toLowerCase().replace('u', 'i').contains("ix"); // LAZY LEVEL 9999
-    public final boolean isMac = System.getProperty("os.name").toLowerCase().contains("mac");
-    public final boolean isSolaris = System.getProperty("os.name").toLowerCase().contains("sunos");
+    public static final String OpSystem = System.getProperty("os.name");
+    public static final boolean isWindows = OpSystem.toLowerCase().contains("win");
+    public static final boolean isLinux = OpSystem.toLowerCase().replace('u', 'i').contains("ix"); // LAZY LEVEL 9999
+    public static final boolean isMac = OpSystem.toLowerCase().contains("mac");
+    public static final boolean isSolaris = OpSystem.toLowerCase().contains("sunos");
+
+    public static HashMap<String, String> exePaths = new HashMap<>();
+    public static HashMap<String, Boolean> exeDependencies = new HashMap<>();
 
     private String PublicIP;
+    public static String ffdesktop;
+    public static String ffinterface;
+
+    static {
+        exePaths.put("ffmpeg", "./ffmpeg.exe");
+        exePaths.put("ffprobe", "./ffprobe.exe");
+        exePaths.put("nircmd", "./nircmd.exe");
+        exePaths.put("wget", "./wget.exe");
+        if(isWindows) { ffdesktop = "gdigrab"; ffinterface = "desktop"; }
+        if(isWindows) { ffdesktop = "avfoundation"; ffinterface = ":0"; }
+        if(isLinux || isSolaris) { ffdesktop = "x11grab"; ffinterface = ":0"; } //idk about solaris but whatever
+
+
+    }
+
+
     private static int[] numpad = {
             KeyEvent.VK_NUMPAD0,
             KeyEvent.VK_NUMPAD1,
@@ -113,27 +132,39 @@ public class CommandUtils {
         BufferedImage img = ImageIO.read(new File("src/main/resources/ss.png"));
         return img;
     }
-/*
-    public static boolean recordVideo(MessageChannel channel) {
-        try {
-            Robot robot = new Robot();
-            ProcessBuilder builder = new ProcessBuilder("ffmpeg -f gdigrab -draw_mouse 0 -i desktop -preset ultrafast -tune zerolatency -crf 0 -pix_fmt yuv420p -movflags +faststart -vframes 1 -q:v 1 screenshot.png -y");
-            builder.start();
-            robot.delay(1000);
-            File recFile = new File("screenshot.png");
-            channel.sendFile(recFile).queue();
-            return true;
-        } catch (Exception e) {
-            e.printStackTrace();
-            System.out.println(System.getProperty("user.dir"));
-            return false;
+
+    public static boolean FileCheck() {
+        return FileCheck(exePaths);
+    }
+    public static boolean FileCheck(HashMap<String, String> exePaths) {
+        boolean exists = true;
+        String[] PathArr = new String[exePaths.size()];
+
+        for(String x : exePaths.keySet()) {
+            exeDependencies.put(x, false);
+
+            // this should check if filepath exists
+            if (isWindows) {
+                File check = new File(exePaths.get(x));
+                if (check.exists()) {
+                    exeDependencies.put(x, true);
+                } else {
+                    exists = false;
+                }
+            }
+            if (isLinux) { // we can probably make linux and mac the same if statement, idek about solaris who knows /shrug xd
+
+            }
+            if(isMac) {
+
+            }
+            if(isSolaris) {
+
+            }
         }
+        return exists;
     }
 
-    public static boolean recordVideo(MessageReceivedEvent event) {
-        return recordVideo(event.getChannel());
-    }
-    */
 
 
     public static int getKeyCode(String str) { // JESUS FUCKING CHRIST DISYER
