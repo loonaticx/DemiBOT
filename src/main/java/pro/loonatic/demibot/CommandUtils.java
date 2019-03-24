@@ -53,7 +53,6 @@ public class CommandUtils {
 
     }
 
-
     private static int[] numpad = {
             KeyEvent.VK_NUMPAD0,
             KeyEvent.VK_NUMPAD1,

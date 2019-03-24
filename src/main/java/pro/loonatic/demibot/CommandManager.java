@@ -30,6 +30,7 @@ public class CommandManager {
         addCommand("keystroke", new KeystrokeCommand());
         addCommand("help", new HelpCommand());
         addCommand("h", new HelpCommand());
+        //addCommand("gitpush", new );
         addCommand("chava", new AvatarCommand()); //gay boy dun work
         try {
             addCommand("sysinfo", new SInfoCommand());

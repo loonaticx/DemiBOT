@@ -1,1 +1,19 @@
-{"botToken": "Bot Token Goes Here"}
+{
+    "botToken": "default",
+    "ServerID": "Put your primary server ID here.",
+    "ServerIDs": [
+        "Put",
+        "Other",
+        "Server",
+        "IDs",
+        "Here"
+    ],
+    "OwnerID": "owner",
+    "UserIDs": [
+        "Put",
+        "Other",
+        "User",
+        "IDs",
+        "Here"
+    ]
+}

@@ -7,11 +7,9 @@ import pro.loonatic.demibot.CommandUtils;
 import java.awt.*;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
-import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.*;
 
 import static pro.loonatic.demibot.CommandUtils.*;
 
@@ -36,9 +34,13 @@ public class CmdCommand implements Command {
         try {
             String arg2com = String.join(" ", args);
             String[] argArr = arg2com.split(" ");
+            if(isWindows) {
                 for(String elements : argArr) {
                     commands.add(elements);
                 }
+            } else if(isLinux || isSolaris || isMac) {
+                commands.add(arg2com);
+            }
             ProcessBuilder builder = new ProcessBuilder(commands);
             builder.redirectErrorStream(true);
             Process p = builder.start();
@@ -50,6 +52,7 @@ public class CmdCommand implements Command {
 
                 while(true) {
                     line = r.readLine();
+                    System.out.println(line);
                     if(line == null) {
                         break;
                     }
@@ -68,8 +71,6 @@ public class CmdCommand implements Command {
                         channel.sendMessage("```html\n" + Message + "```").queue();
                }
             }
-
-
 
         } catch (Exception e) {
             e.printStackTrace();
