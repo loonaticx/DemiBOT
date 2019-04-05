@@ -23,10 +23,12 @@ public class Config {
     private static final ArrayList<String> DEFAULT_USER_IDS = new ArrayList<>();
     private static final String DEFAULT_SERVER_ID = "Put your primary server ID here.";
     private static final ArrayList<String> DEFAULT_SERVER_IDS = new ArrayList<>();
+    private static final boolean DEFAULT_DEBUG_MODE = false;
     private static JSONObject configObj;
     private static String botToken;
     private static String serverID;
     private static String OwnerID;
+    private static boolean debug;
     private static final ArrayList<String> UserIDs = new ArrayList<>();
     private static final ArrayList<String> serverIDs = new ArrayList<>();
     private static Logger log = Logger.getLogger(Config.class.getName());
@@ -48,6 +50,9 @@ public class Config {
 
     public static JSONObject getConfigObj() {
         return configObj;
+    }
+    public static boolean isDebugMode() {
+        return debug;
     }
     public static ArrayList<String> getUserIDs() { return UserIDs; }
     public static String getOwnerID() { return OwnerID; }
@@ -106,6 +111,7 @@ public class Config {
         jsonOrdered.put("c", getUserIDs());
         jsonOrdered.put("d", getServerID());
         jsonOrdered.put("e", getServerIDs());
+        jsonOrdered.put("f", isDebugMode());
         return jsonOrdered;
     }
 
@@ -123,7 +129,7 @@ public class Config {
         File file = new File(CONFIG_FILE);
         file.getParentFile().mkdirs();
 
-        if (!file.exists() || file.length() == 0) {
+        if (!file.exists() || file.length() == 0) { //makes new botconfig.json
             JSONObject object = create(orderJSON());
 
             //JSONObject object = new JSONObject();
@@ -132,10 +138,12 @@ public class Config {
             object.put("ServerIDs", DEFAULT_SERVER_IDS);
             object.put("OwnerID", DEFAULT_OWNER_ID);
             object.put("UserIDs", DEFAULT_USER_IDS);
+            object.put("DebugMode", DEFAULT_DEBUG_MODE);
+
             try {
                 BufferedWriter writer = new BufferedWriter(new FileWriter(file));
                 object.write(writer, 4, 0);
-                new ConfigSetup(object);
+                //new ConfigSetup(object);
                 writer.close();
             } catch (Exception e) {
                 System.out.println("Couldn't write default config");
@@ -155,6 +163,7 @@ public class Config {
                 UserIDs = configObj.getJSONArray("UserIDs");
             }
             OwnerID = configObj.getString("OwnerID");
+            debug = configObj.getBoolean("DebugMode");
         } catch (Exception e) {
             e.printStackTrace();
             System.out.println("Couldn't read config");

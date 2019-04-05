@@ -13,11 +13,6 @@ public class ConfigSetup {
         setup(object);
     }
     public JSONObject setup(JSONObject object) throws IOException {
-        title = new Scanner(new File("src/main/resources/asciiart"));
-        while(title.hasNextLine()) {
-            System.out.println(title.nextLine());
-        }
-        System.out.println();
         while(!object.isEmpty()) {
 
         }

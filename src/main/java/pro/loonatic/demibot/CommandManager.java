@@ -5,6 +5,9 @@ import pro.loonatic.demibot.commands.*;
 import java.util.HashMap;
 import java.util.Map;
 
+import static pro.loonatic.demibot.Config.getOwnerID;
+import static pro.loonatic.demibot.Config.getUserIDs;
+
 public class CommandManager {
     private static Map<String, Command> commands = new HashMap<String, Command>();
     static {
@@ -39,6 +42,14 @@ public class CommandManager {
         }
     }
 
+    public CommandManager(boolean debug) {
+        if(debug) {
+            System.out.println("Headless? " + java.awt.GraphicsEnvironment.isHeadless());
+            System.out.println("User IDs: " + getUserIDs());
+            System.out.println("Owner ID: " + getOwnerID());
+        }
+    }
+
     public static void addCommand(String commandName, Command command) {
         commands.put(commandName, command);
     }
@@ -57,3 +68,5 @@ public class CommandManager {
         return null;
     }
 }
+
+//Development / Debug commmands

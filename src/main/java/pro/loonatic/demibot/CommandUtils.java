@@ -11,10 +11,8 @@ import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
+import java.lang.reflect.Field;
 import java.net.InetAddress;
 import java.net.URL;
 import java.net.UnknownHostException;
@@ -23,16 +21,19 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Scanner;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
 public class CommandUtils {
 
+    private static Scanner title;
     public static final String OpSystem = System.getProperty("os.name");
     public static final boolean isWindows = OpSystem.toLowerCase().contains("win");
     public static final boolean isLinux = OpSystem.toLowerCase().replace('u', 'i').contains("ix"); // LAZY LEVEL 9999
     public static final boolean isMac = OpSystem.toLowerCase().contains("mac");
     public static final boolean isSolaris = OpSystem.toLowerCase().contains("sunos");
+    private static String whatami; //useless for now
 
     public static HashMap<String, String> exePaths = new HashMap<>();
     public static HashMap<String, Boolean> exeDependencies = new HashMap<>();
@@ -42,15 +43,26 @@ public class CommandUtils {
     public static String ffinterface;
 
     static {
+        try {
+            Field defaultHeadlessField = java.awt.GraphicsEnvironment.class.getDeclaredField("defaultHeadless");
+            defaultHeadlessField.setAccessible(true);
+            defaultHeadlessField.set(null,Boolean.FALSE);
+            Field headlessField = java.awt.GraphicsEnvironment.class.getDeclaredField("headless");
+            headlessField.setAccessible(true);
+            headlessField.set(null,Boolean.FALSE);
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (NoSuchFieldException e) {
+            e.printStackTrace();
+        }
         exePaths.put("ffmpeg", "./ffmpeg.exe");
         exePaths.put("ffprobe", "./ffprobe.exe");
         exePaths.put("nircmd", "./nircmd.exe");
         exePaths.put("wget", "./wget.exe");
-        if(isWindows) { ffdesktop = "gdigrab"; ffinterface = "desktop"; }
-        if(isWindows) { ffdesktop = "avfoundation"; ffinterface = ":0"; }
-        if(isLinux || isSolaris) { ffdesktop = "x11grab"; ffinterface = ":0"; } //idk about solaris but whatever
-
-
+        if(isWindows) { System.setProperty("java.awt.headless", "true"); ffdesktop = "gdigrab"; ffinterface = "desktop"; }
+        if(isMac) { ffdesktop = "avfoundation"; ffinterface = ":0"; }
+        if(isLinux || isSolaris) { ffdesktop = "x11grab"; ffinterface = ":0"; whatami = "Linux"; System.setProperty("java.awt.headless", "true");} //idk about solaris but whatever
+        //System.out.println("headless? " + java.awt.GraphicsEnvironment.isHeadless());
     }
 
     private static int[] numpad = {
@@ -338,6 +350,13 @@ public class CommandUtils {
     public int gethashCode() throws UnknownHostException {
         int HashCode = InetAddress.getLocalHost().hashCode();
         return HashCode;
+    }
+    public static void title(String variation) throws FileNotFoundException {
+        title = new Scanner(new File("src/main/resources/" + variation));
+        while(title.hasNextLine()) {
+            System.out.println(title.nextLine());
+        }
+        System.out.println();
     }
 
 }

@@ -7,18 +7,26 @@ import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
 
 import javax.security.auth.login.LoginException;
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static pro.loonatic.demibot.Config.getBotToken;
+import static pro.loonatic.demibot.Config.*;
+import static pro.loonatic.demibot.SecurityUtils.*;
 
 
 public class Main {
     public static JDA jda;
-    public static void main(String...args) {
-        //System.out.println(System.getProperty("os.name")); // Windows 10 if this contains "Windows" or "windows"
+    public static void main(String...args) throws FileNotFoundException {
         Config.loadConfig();
+        CommandUtils.title("titleart");
+        final boolean debug = isDebugMode();
+        if(debug) {
+            System.out.println("*** DEBUG MODE IS TURNED ON! ***");
+        }
+        new CommandManager(debug);
+
         try {
             jda = new JDABuilder(AccountType.BOT)
                     .setToken(getBotToken())
@@ -39,8 +47,20 @@ class MessageListener extends ListenerAdapter {
     public void onMessageReceived(MessageReceivedEvent event) {
         //User self = (User)event.getJDA();
         User author = event.getAuthor();
+        String authorID = author.getId();
 
-        //boolean isLoonatic = author.getId().equals("141314236998615040");
+        if(!isOwner(author)) { //should be temp for now
+            return;
+        }
+
+        if(isDebugMode()) {
+            System.out.println("AUTHOR? " + event.getAuthor()+ " " + isOwner(author));
+            System.out.println("TRUSTED? " + event.getAuthor() + " " + isTrustedUser(author));
+        }
+
+        if(!isTrustedUser(author) || !isOwner(author)) {
+            return;
+        }
 
         if (author.isBot() || !event.isFromType(ChannelType.TEXT)) {
             return;
