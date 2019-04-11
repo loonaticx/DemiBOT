@@ -20,11 +20,8 @@ public class Main {
     public static JDA jda;
     public static void main(String...args) throws FileNotFoundException {
         Config.loadConfig();
-        CommandUtils.title("titleart");
         final boolean debug = isDebugMode();
-        if(debug) {
-            System.out.println("*** DEBUG MODE IS TURNED ON! ***");
-        }
+        new CommandUtils();
         new CommandManager(debug);
 
         try {
@@ -38,6 +35,8 @@ public class Main {
             e.printStackTrace();
         }
         System.out.println("Connected");
+        jda.getPresence().setGame(Game.streaming("on " + System.getProperty("os.name"), "https://twitch.tv/loonatricks"));
+        //jda.getPresence().setStatus(OnlineStatus.DO_NOT_DISTURB);
     }
 }
 
@@ -47,18 +46,20 @@ class MessageListener extends ListenerAdapter {
     public void onMessageReceived(MessageReceivedEvent event) {
         //User self = (User)event.getJDA();
         User author = event.getAuthor();
-        String authorID = author.getId();
-
-        if(!isOwner(author)) { //should be temp for now
-            return;
-        }
+        Guild guild = event.getGuild();
 
         if(isDebugMode()) {
-            System.out.println("AUTHOR? " + event.getAuthor()+ " " + isOwner(author));
-            System.out.println("TRUSTED? " + event.getAuthor() + " " + isTrustedUser(author));
+            if(!isOwner(author)) {
+                System.out.println("TRUSTED? " + author + " " + isTrustedUser(author));
+                return;
+            }
+            System.out.println("AUTHOR? " + author+ " " + isOwner(author));
+            System.out.println("SERVER TRUSTED? " + guild + " " + isTrustedServer(guild));
         }
-
-        if(!isTrustedUser(author) || !isOwner(author)) {
+        if (!isTrustedServer(guild)) {
+            return;
+        }
+        if (!isTrustedUser(author) && !isOwner(author)) {
             return;
         }
 
@@ -90,17 +91,6 @@ class MessageListener extends ListenerAdapter {
         }
 
 
-            /*
-            if (msg.startsWith("pfp")){
-                try {
-                    jda.changePresence(StatusType.IDLE, ActivityType.PLAYING, "playing text");
-                }catch (AWTException e) {
-                    e.printStackTrace();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-            */
 /*
             else if (msg.contains("test")) {
             File f = new File("path/to/file.jpg");

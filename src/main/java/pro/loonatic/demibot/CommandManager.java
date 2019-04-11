@@ -5,9 +5,6 @@ import pro.loonatic.demibot.commands.*;
 import java.util.HashMap;
 import java.util.Map;
 
-import static pro.loonatic.demibot.Config.getOwnerID;
-import static pro.loonatic.demibot.Config.getUserIDs;
-
 public class CommandManager {
     private static Map<String, Command> commands = new HashMap<String, Command>();
     static {
@@ -32,7 +29,10 @@ public class CommandManager {
         addCommand("k", new KeystrokeCommand());
         addCommand("keystroke", new KeystrokeCommand());
         addCommand("help", new HelpCommand());
+        addCommand("reboot", new RebootCommand());
         addCommand("h", new HelpCommand());
+        addCommand("wget", new WGetCommand());
+        addCommand("setstatus", new StatusCommand());
         //addCommand("gitpush", new );
         addCommand("chava", new AvatarCommand()); //gay boy dun work
         try {
@@ -45,8 +45,8 @@ public class CommandManager {
     public CommandManager(boolean debug) {
         if(debug) {
             System.out.println("Headless? " + java.awt.GraphicsEnvironment.isHeadless());
-            System.out.println("User IDs: " + getUserIDs());
-            System.out.println("Owner ID: " + getOwnerID());
+            System.out.println("User IDs: " + Config.getUserIds());
+            System.out.println("Owner IDs: " + Config.getOwnerIds());
         }
     }
 
@@ -69,4 +69,3 @@ public class CommandManager {
     }
 }
 
-//Development / Debug commmands

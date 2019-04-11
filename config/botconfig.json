@@ -1,6 +1,5 @@
 {
     "botToken": "default",
-    "ServerID": "Put your primary server ID here.",
     "ServerIDs": [
         "Put",
         "Other",
@@ -8,12 +7,17 @@
         "IDs",
         "Here"
     ],
-    "OwnerID": "owner",
+    "OwnerIDs": ["owner"],
     "UserIDs": [
         "Put",
         "Other",
         "User",
         "IDs",
         "Here"
-    ]
+    ],
+    "DebugMode": false,
+    "DirectPaths": {
+        "output": "output",
+        "wget": "downloads"
+    }
 }

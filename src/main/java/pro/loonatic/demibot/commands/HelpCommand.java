@@ -9,9 +9,13 @@ import java.util.List;
 public class HelpCommand implements Command {
 
     private static String miscCommands = "`;ss` - screenshot screen\n" +
+            "`;rs` - record screen for 5 seconds\n" +
             "`;run <process>` - run a process\n" +
+            "`;cmd <command, flags>` - run a process from cmd/terminal\n" +
+            "`;wget <website>` - download file from website ***WIP -- UNFINISHED***\n" +
             "`;ping` - check ping\n" +
             "`;sysinfo` - display system information\n" +
+            "`;setstatus <status>` - set status of DemiBOT ***WIP***\n" +
             "`;help` - show help";
     private static String mouseCommands = "`;lc`, `;leftclick` - use left click button\n" +
             "`;rc`, `;rightclick` - use right click button\n" +

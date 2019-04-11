@@ -1,5 +1,6 @@
 package pro.loonatic.demibot.commands;
 
+import net.dv8tion.jda.core.entities.MessageChannel;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import pro.loonatic.demibot.CommandUtils;
 
@@ -8,12 +9,17 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import static pro.loonatic.demibot.Config.isDebugMode;
+
 public class KeystrokeCommand implements Command {
 
     public void process(MessageReceivedEvent event, List< String > args) throws Exception {
+        MessageChannel channel = event.getChannel();
         String msg = event.getMessage().getContentRaw().replaceAll("\\s\\+\\s", "+");
         args = new ArrayList<String>(Arrays.asList(msg.split(" ")));
         args.remove(0);
+        List<Integer> keyCodes = new ArrayList<Integer>();
+
 
         if (args.isEmpty()) {
             return;
@@ -25,7 +31,6 @@ public class KeystrokeCommand implements Command {
             if (arg.startsWith("[") && arg.endsWith("]")) {
                 arg = arg.substring(1, arg.length() - 1);
 
-                List<Integer> keyCodes = new ArrayList<Integer>();
 
                 for (String str : arg.split("\\+")) {
                     int keyCode = CommandUtils.getKeyCode(str);
@@ -54,6 +59,10 @@ public class KeystrokeCommand implements Command {
         }
 
         robot.delay(2000);
+        if(isDebugMode()) {
+            System.out.println(event.getAuthor() + "Keypressed: " + args + " | Keycode: " + keyCodes);
+        }
+        channel.sendMessage("<@" + event.getAuthor().getId() + "> has keypressed: ``" + args + "``").queue();
         CommandUtils.sendScreenshot(event);
     }
 }

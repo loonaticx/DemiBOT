@@ -5,6 +5,7 @@ import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.entities.MessageChannel;
 import net.dv8tion.jda.core.entities.User;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
+import pro.loonatic.demibot.commands.CmdCommand;
 import pro.loonatic.demibot.commands.Command;
 
 import javax.imageio.ImageIO;
@@ -16,18 +17,17 @@ import java.lang.reflect.Field;
 import java.net.InetAddress;
 import java.net.URL;
 import java.net.UnknownHostException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Scanner;
+import java.util.*;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
 public class CommandUtils {
-
-    private static Scanner title;
     public static final String OpSystem = System.getProperty("os.name");
     public static final boolean isWindows = OpSystem.toLowerCase().contains("win");
     public static final boolean isLinux = OpSystem.toLowerCase().replace('u', 'i').contains("ix"); // LAZY LEVEL 9999
@@ -35,14 +35,24 @@ public class CommandUtils {
     public static final boolean isSolaris = OpSystem.toLowerCase().contains("sunos");
     private static String whatami; //useless for now
 
-    public static HashMap<String, String> exePaths = new HashMap<>();
-    public static HashMap<String, Boolean> exeDependencies = new HashMap<>();
+    public static final HashMap<String, String> exePaths = new HashMap<>();
+    public static final HashMap<String, Boolean> exeDependencies = new HashMap<>();
 
-    private String PublicIP;
     public static String ffdesktop;
     public static String ffinterface;
+    private static final boolean debug;
 
     static {
+        try {
+            title("titleart");
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        System.out.println("DemiBOT Alpha v.1.2.7");
+        debug = Config.isDebugMode();
+        if(debug) {
+            System.out.println("*** DEBUG MODE IS TURNED ON! ***");
+        }
         try {
             Field defaultHeadlessField = java.awt.GraphicsEnvironment.class.getDeclaredField("defaultHeadless");
             defaultHeadlessField.setAccessible(true);
@@ -55,17 +65,21 @@ public class CommandUtils {
         } catch (NoSuchFieldException e) {
             e.printStackTrace();
         }
+
         exePaths.put("ffmpeg", "./ffmpeg.exe");
         exePaths.put("ffprobe", "./ffprobe.exe");
         exePaths.put("nircmd", "./nircmd.exe");
         exePaths.put("wget", "./wget.exe");
-        if(isWindows) { System.setProperty("java.awt.headless", "true"); ffdesktop = "gdigrab"; ffinterface = "desktop"; }
-        if(isMac) { ffdesktop = "avfoundation"; ffinterface = ":0"; }
-        if(isLinux || isSolaris) { ffdesktop = "x11grab"; ffinterface = ":0"; whatami = "Linux"; System.setProperty("java.awt.headless", "true");} //idk about solaris but whatever
+
+        if(isWindows) { System.setProperty("java.awt.headless", "true"); ffdesktop = "gdigrab"; ffinterface = "desktop"; whatami = "Windows";}
+        if(isMac) { ffdesktop = "avfoundation"; ffinterface = ":0"; whatami = "Mac";}
+        if(isLinux || isSolaris) { ffdesktop = "x11grab"; ffinterface = ":0"; whatami = "Linux"; System.setProperty("java.awt.headless", "true"); } //idk about solaris but whatever
+        System.out.println("We're on: " + whatami); //debug
+        FileCheck();
         //System.out.println("headless? " + java.awt.GraphicsEnvironment.isHeadless());
     }
 
-    private static int[] numpad = {
+    private static final int[] numpad = {
             KeyEvent.VK_NUMPAD0,
             KeyEvent.VK_NUMPAD1,
             KeyEvent.VK_NUMPAD2,
@@ -77,7 +91,7 @@ public class CommandUtils {
             KeyEvent.VK_NUMPAD8,
             KeyEvent.VK_NUMPAD9
     };
-    private static DateFormat hourFormat = new SimpleDateFormat("hh:mm a");
+    private static final DateFormat hourFormat = new SimpleDateFormat("hh:mm a");
 
     public CommandUtils() {
     }
@@ -126,7 +140,7 @@ public class CommandUtils {
 
             Image mouseImage = ImageIO.read(new File("src/main/resources/mouse.png")).getScaledInstance(15, 24, 0);
             img.getGraphics().drawImage(mouseImage, x, y, null);
-            File imgFile = new File("src/main/resources/ss.png");
+            File imgFile = Config.getDirectFile("output", "ss.png");
             ImageIO.write(img, "png", imgFile);
             channel.sendFile(imgFile).queue();
             return true;
@@ -139,16 +153,19 @@ public class CommandUtils {
         return sendScreenshot(event.getChannel());
     }
 
-    public static Image getScreenshot() throws IOException {
-        BufferedImage img = ImageIO.read(new File("src/main/resources/ss.png"));
-        return img;
+    public static Image getScreenshot() {
+        try {
+            return ImageIO.read(Config.getDirectFile("output", "ss.png"));
+        } catch (Exception e) {
+            return null;
+        }
     }
 
     public static boolean FileCheck() {
         return FileCheck(exePaths);
     }
-    public static boolean FileCheck(HashMap<String, String> exePaths) {
-        boolean exists = true;
+    public static boolean FileCheck(HashMap<String, String> exePaths) { //check path environment too later wipp
+        boolean exists = true; //self note: should always be true unless something makes it false
         String[] PathArr = new String[exePaths.size()];
 
         for(String x : exePaths.keySet()) {
@@ -156,9 +173,16 @@ public class CommandUtils {
 
             // this should check if filepath exists
             if (isWindows) {
+
                 File check = new File(exePaths.get(x));
-                if (check.exists()) {
+                if(debug) {
+                    System.out.println("Does path contain " + x + " ? : " + System.getenv("Path").contains(x)); // needs to be changed to"./DemiBOT/bin"
+                }
+                if (check.exists() || System.getenv("Path").contains(x)) {
                     exeDependencies.put(x, true);
+                    if(debug) {
+                        System.out.println("DEBUG: We're clear.");
+                    }
                 } else {
                     exists = false;
                 }
@@ -176,7 +200,30 @@ public class CommandUtils {
         return exists;
     }
 
-
+    public static void wGet(List<String> args) {
+        ArrayList<String> command = new ArrayList<>();
+        String link = args.toString();
+        link = link.substring(1, link.length()-1);
+        command.add("cmd.exe");
+        command.add("/c");
+        command.add("wget");
+        command.add("/P");
+        command.add(link);
+        System.out.println(link);
+        command.add(String.format("\"%s\"", Config.getDirectFolder("wget")));
+        System.out.println(command);
+        ProcessBuilder pb = new ProcessBuilder(command);
+    }
+/*
+shell.exec(`wget ${args} -P "./Downloads/"`, (error, complete) => {
+                          if (error && (isLinux || isDarwin)) {
+                            send('There was an error running `'+message.content+'`. Make sure your link is a valid download link, or... \nPlease run ``sudo apt install -y wget`` to install ``wget``.');
+                            return;
+                          } else if (error && isWindows) {
+                            send('There was an error running `'+message.content+'`. Make sure your link is a valid download link, or... \nMake sure ``wget.exe`` is in the same location as ``bot.js``.');
+                            return;
+                          }
+ */
 
     public static int getKeyCode(String str) { // JESUS FUCKING CHRIST DISYER
         str = str.toLowerCase();
@@ -318,45 +365,51 @@ public class CommandUtils {
         BufferedReader sc = new BufferedReader(new InputStreamReader(MyIPURL.openStream()));
 
         PublicIP = sc.readLine().trim();
-        this.PublicIP = PublicIP;
+        String publicIP = PublicIP;
         return PublicIP;
     }
 
     public InetAddress getLocalHost() throws UnknownHostException {
-        InetAddress LocalHost = InetAddress.getLocalHost();
-        return LocalHost;
+        return InetAddress.getLocalHost();
     }
 
     public InetAddress getLoopbackAddress() {
-        InetAddress LoopbackAddress = InetAddress.getLoopbackAddress();
-        return LoopbackAddress;
+        return InetAddress.getLoopbackAddress();
     }
 
     public String getCanonicalHostName() throws UnknownHostException {
-        String CanonicalHN = InetAddress.getLocalHost().getCanonicalHostName();
-        return CanonicalHN;
+        return InetAddress.getLocalHost().getCanonicalHostName();
     }
 
     public String getLocalIP() throws IOException {
-        String HostAddress = InetAddress.getLocalHost().getHostAddress();
-        return HostAddress;
+        return InetAddress.getLocalHost().getHostAddress();
     }
 
     public String getHostName() throws UnknownHostException {
-        String HostName = InetAddress.getLocalHost().getHostName();
-        return HostName;
+        return InetAddress.getLocalHost().getHostName();
     }
 
     public int gethashCode() throws UnknownHostException {
-        int HashCode = InetAddress.getLocalHost().hashCode();
-        return HashCode;
+        return InetAddress.getLocalHost().hashCode();
     }
     public static void title(String variation) throws FileNotFoundException {
-        title = new Scanner(new File("src/main/resources/" + variation));
-        while(title.hasNextLine()) {
-            System.out.println(title.nextLine());
+        try {
+            Scanner title = new Scanner(new File("src/main/resources/" + variation));
+            while (title.hasNextLine()) {
+                System.out.println(title.nextLine());
+            }
+            System.out.println();
+        } catch (Exception e) {
+            System.out.println("Title art not found");
         }
-        System.out.println();
+    }
+
+    public static String readFile(String path) {
+        try {
+            return new String(Files.readAllBytes(Paths.get(path)), StandardCharsets.UTF_8);
+        } catch (Exception e) {
+            return null;
+        }
     }
 
 }

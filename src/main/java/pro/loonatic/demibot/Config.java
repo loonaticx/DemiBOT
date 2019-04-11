@@ -4,13 +4,8 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.lang.reflect.Field;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Scanner;
+import java.util.*;
 import java.util.logging.Logger;
 
 import org.json.JSONArray;
@@ -19,33 +14,34 @@ import org.json.JSONObject;
 public class Config {
     private static final String CONFIG_FILE = "config/botconfig.json";
     private static final String DEFAULT_BOT_TOKEN = "default";
-    private static final String DEFAULT_OWNER_ID = "owner";
-    private static final ArrayList<String> DEFAULT_USER_IDS = new ArrayList<>();
-    private static final String DEFAULT_SERVER_ID = "Put your primary server ID here.";
-    private static final ArrayList<String> DEFAULT_SERVER_IDS = new ArrayList<>();
-    private static final boolean DEFAULT_DEBUG_MODE = false;
+    private static final Map<String, Object> DEFAULT_CONFIG = new LinkedHashMap<String, Object>();
+    private static final JSONObject DEFAULT_DIRECT_PATHS = new JSONObject();
+
     private static JSONObject configObj;
     private static String botToken;
-    private static String serverID;
-    private static String OwnerID;
     private static boolean debug;
-    private static final ArrayList<String> UserIDs = new ArrayList<>();
-    private static final ArrayList<String> serverIDs = new ArrayList<>();
+    private static final List<String> ownerIds = new ArrayList<String>();
+    private static final List<String> userIds = new ArrayList<String>();
+    private static final List<String> serverIds = new ArrayList<String>();
+    private static final Map<String, String> directPaths = new HashMap<String, String>();
     private static Logger log = Logger.getLogger(Config.class.getName());
     private static boolean setupDone = false;
     private static Field JSONObjectMapField = null;
 
     static {
-        DEFAULT_USER_IDS.add("Put");
-        DEFAULT_USER_IDS.add("Other");
-        DEFAULT_USER_IDS.add("User");
-        DEFAULT_USER_IDS.add("IDs");
-        DEFAULT_USER_IDS.add("Here");
-        DEFAULT_SERVER_IDS.add("Put");
-        DEFAULT_SERVER_IDS.add("Other");
-        DEFAULT_SERVER_IDS.add("Server");
-        DEFAULT_SERVER_IDS.add("IDs");
-        DEFAULT_SERVER_IDS.add("Here");
+        JSONArray defaultServerIds = new JSONArray(Arrays.asList("Put your primary server ID here", "Put", "Other", "Server", "IDs", "Here"));
+        JSONArray defaultOwnerIds = new JSONArray(Arrays.asList("owner"));
+        JSONArray defaultUserIds = new JSONArray(Arrays.asList("Put", "Other", "User", "IDs", "Here"));
+
+        DEFAULT_DIRECT_PATHS.put("wget", "downloads");
+        DEFAULT_DIRECT_PATHS.put("output", "output");
+
+        DEFAULT_CONFIG.put("botToken", DEFAULT_BOT_TOKEN);
+        DEFAULT_CONFIG.put("ServerIDs", defaultServerIds);
+        DEFAULT_CONFIG.put("OwnerIDs", defaultOwnerIds);
+        DEFAULT_CONFIG.put("UserIDs", defaultUserIds);
+        DEFAULT_CONFIG.put("DebugMode", false);
+        DEFAULT_CONFIG.put("DirectPaths", DEFAULT_DIRECT_PATHS);
     }
 
     public static JSONObject getConfigObj() {
@@ -54,31 +50,46 @@ public class Config {
     public static boolean isDebugMode() {
         return debug;
     }
-    public static ArrayList<String> getUserIDs() { return UserIDs; }
-    public static String getOwnerID() { return OwnerID; }
     public static String getBotToken() {
         return botToken;
     }
     public static boolean hasBotToken() {
         return botToken != null && !botToken.equals(DEFAULT_BOT_TOKEN);
     }
-    public static String getServerID() {
-        return serverID;
+    public static List<String> getOwnerIds() {
+        return ownerIds;
     }
-    public static ArrayList<String> getServerIDs() {
-        return serverIDs;
+    public static List<String> getUserIds() {
+        return userIds;
     }
-    public static boolean MultipleSIDsExist() {
-        if(!getServerIDs().isEmpty())
-            return true;
-        else
-            return false;
+    public static List<String> getServerIds() {
+        return serverIds;
     }
-    public static boolean MultipleUIDsExist() {
-        if(!getUserIDs().isEmpty())
-            return true;
-        else
-            return false;
+    public static Map<String, String> getDirectPaths() {
+        return directPaths;
+    }
+
+    public static String getDirectFolder(String fileType) {
+        if (directPaths.containsKey(fileType)) {
+            return directPaths.get(fileType);
+        } else {
+            return DEFAULT_DIRECT_PATHS.getString(fileType);
+        }
+    }
+
+    public static File getDirectFile(String fileType, String filename) {
+        File file = Paths.get(getDirectFolder(fileType), filename).toFile();
+        File parent = file.getParentFile();
+
+        if (parent != null && !parent.exists()) {
+            parent.mkdirs();
+        }
+
+        return file;
+    }
+
+    public static File getConfigFile() {
+        return new File(CONFIG_FILE);
     }
 
     // https://stackoverflow.com/a/36156142
@@ -93,80 +104,97 @@ public class Config {
             }
         }
     }
-    private static JSONObject create(Map in) {
+    private static JSONObject getOrderedJSON(JSONObject object) {
         setupFieldAccessor();
-        JSONObject object = new JSONObject();
+
         try {
             if (JSONObjectMapField != null) {
                 JSONObjectMapField.set(object, new LinkedHashMap<>());
             }
-        }catch (IllegalAccessException ignored) {}
+        } catch (IllegalAccessException ignored) {
+            // Not that important.
+        }
+
         return object;
     }
 
-    public static Map orderJSON() {
-        Map jsonOrdered = new LinkedHashMap();
-        jsonOrdered.put("a", getBotToken());
-        jsonOrdered.put("b", getOwnerID());
-        jsonOrdered.put("c", getUserIDs());
-        jsonOrdered.put("d", getServerID());
-        jsonOrdered.put("e", getServerIDs());
-        jsonOrdered.put("f", isDebugMode());
-        return jsonOrdered;
-    }
+    public static void saveConfig() {
+        JSONObject orderedJSON = getOrderedJSON(new JSONObject());
 
-    public static String readFile(String path) {
+        // Copy everything to the ordered JSON
+        for (String key : DEFAULT_CONFIG.keySet()) {
+            orderedJSON.put(key, configObj.get(key));
+        }
+
         try {
-            return new String(Files.readAllBytes(Paths.get(path)), StandardCharsets.UTF_8);
+            BufferedWriter writer = new BufferedWriter(new FileWriter(getConfigFile()));
+            orderedJSON.write(writer, 4, 0);
+            //new ConfigSetup(object);
+            writer.close();
         } catch (Exception e) {
-            return null;
+            System.out.println("Couldn't write config");
+            e.printStackTrace();
+            System.exit(0);
         }
     }
 
     public static void loadConfig() {
-        JSONArray ServerIDs = new JSONArray(serverIDs);
-        JSONArray UserIDs = new JSONArray(serverIDs);
-        File file = new File(CONFIG_FILE);
+        File file = getConfigFile();
         file.getParentFile().mkdirs();
+        boolean exists = file.exists() && file.length() > 0;
+        boolean edited = false;
 
-        if (!file.exists() || file.length() == 0) { //makes new botconfig.json
-            JSONObject object = create(orderJSON());
-
-            //JSONObject object = new JSONObject();
-            object.put("botToken", DEFAULT_BOT_TOKEN);
-            object.put("ServerID", DEFAULT_SERVER_ID);
-            object.put("ServerIDs", DEFAULT_SERVER_IDS);
-            object.put("OwnerID", DEFAULT_OWNER_ID);
-            object.put("UserIDs", DEFAULT_USER_IDS);
-            object.put("DebugMode", DEFAULT_DEBUG_MODE);
-
-            try {
-                BufferedWriter writer = new BufferedWriter(new FileWriter(file));
-                object.write(writer, 4, 0);
-                //new ConfigSetup(object);
-                writer.close();
-            } catch (Exception e) {
-                System.out.println("Couldn't write default config");
+        try {
+            configObj = new JSONObject(CommandUtils.readFile(CONFIG_FILE));
+        } catch (Exception e) {
+            if (exists) {
                 e.printStackTrace();
+                System.out.println("Oh no!! Your config file is corrupt! Please fix it!");
                 System.exit(0);
+            }
+
+            configObj = new JSONObject();
+        }
+
+        for (Map.Entry<String, Object> entry : DEFAULT_CONFIG.entrySet()) {
+            if (!configObj.has(entry.getKey())) {
+                configObj.put(entry.getKey(), entry.getValue());
+                edited = true;
             }
         }
 
+        if (edited) {
+            saveConfig();
+        }
+
         try {
-            configObj = new JSONObject(readFile(CONFIG_FILE));
             botToken = configObj.getString("botToken");
-            serverID = configObj.getString("ServerID");
-            if(MultipleSIDsExist()) {
-                ServerIDs = configObj.getJSONArray("ServerIDs");
-            }
-            if(MultipleUIDsExist()) {
-                UserIDs = configObj.getJSONArray("UserIDs");
-            }
-            OwnerID = configObj.getString("OwnerID");
             debug = configObj.getBoolean("DebugMode");
+            ownerIds.clear();
+            serverIds.clear();
+            userIds.clear();
+            directPaths.clear();
+
+            for (Object ownerId : configObj.getJSONArray("OwnerIDs").toList()) {
+                ownerIds.add(String.valueOf(ownerId));
+            }
+
+            for (Object serverId : configObj.getJSONArray("ServerIDs").toList()) {
+                serverIds.add(String.valueOf(serverId));
+            }
+
+            for (Object userId : configObj.getJSONArray("UserIDs").toList()) {
+                userIds.add(String.valueOf(userId));
+            }
+
+            directPaths.clear();
+
+            for (Map.Entry<String, Object> entry : configObj.getJSONObject("DirectPaths").toMap().entrySet()) {
+                directPaths.put(entry.getKey(), String.valueOf(entry.getValue()));
+            }
         } catch (Exception e) {
             e.printStackTrace();
-            System.out.println("Couldn't read config");
+            System.out.println("Couldn't interpret config");
             System.exit(0);
         }
     }

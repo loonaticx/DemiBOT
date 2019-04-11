@@ -4,7 +4,6 @@ import net.dv8tion.jda.core.entities.MessageChannel;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import pro.loonatic.demibot.CommandUtils;
 
-import java.awt.*;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
@@ -18,7 +17,6 @@ public class CmdCommand implements Command {
 
     public void process(MessageReceivedEvent event, List<String> args) throws Exception {
         MessageChannel channel = event.getChannel();
-        Robot robot = new Robot();
         List<String> commands = new ArrayList<String>();
         if(isWindows) {
             commands.add("cmd.exe");
@@ -42,10 +40,11 @@ public class CmdCommand implements Command {
                 commands.add(arg2com);
             }
             ProcessBuilder builder = new ProcessBuilder(commands);
+            System.out.println(commands);
             builder.redirectErrorStream(true);
             Process p = builder.start();
             BufferedReader r = new BufferedReader(new InputStreamReader(p.getInputStream()));
-            robot.delay(1000);
+            Thread.sleep(1000);
 
             String line;
             String Message = "";
