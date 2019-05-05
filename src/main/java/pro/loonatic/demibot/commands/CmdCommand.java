@@ -3,22 +3,28 @@ package pro.loonatic.demibot.commands;
 import net.dv8tion.jda.core.entities.MessageChannel;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import pro.loonatic.demibot.CommandUtils;
+import pro.loonatic.demibot.Config;
+
+import static pro.loonatic.demibot.Config.*;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 
 import static pro.loonatic.demibot.CommandUtils.*;
 
 public class CmdCommand implements Command {
 
-
     public void process(MessageReceivedEvent event, List<String> args) throws Exception {
         MessageChannel channel = event.getChannel();
         List<String> commands = new ArrayList<String>();
-        if(isWindows) {
+
+        if (isWindows) {
             commands.add("cmd.exe");
             commands.add("/c");
         } else if (isLinux || isSolaris || isMac) {
@@ -26,54 +32,52 @@ public class CmdCommand implements Command {
             commands.add("-c");
         }
 
-
-        CommandUtils utils = new CommandUtils();
-
         try {
             String arg2com = String.join(" ", args);
             String[] argArr = arg2com.split(" ");
-            if(isWindows) {
-                for(String elements : argArr) {
+
+            if (isWindows) {
+                for (String elements : argArr) {
                     commands.add(elements);
                 }
-            } else if(isLinux || isSolaris || isMac) {
+            } else if (isLinux || isSolaris || isMac) {
                 commands.add(arg2com);
             }
-            ProcessBuilder builder = new ProcessBuilder(commands);
-            System.out.println(commands);
-            builder.redirectErrorStream(true);
-            Process p = builder.start();
-            BufferedReader r = new BufferedReader(new InputStreamReader(p.getInputStream()));
-            Thread.sleep(1000);
-
-            String line;
-            String Message = "";
-
-                while(true) {
-                    line = r.readLine();
-                    System.out.println(line);
-                    if(line == null) {
-                        break;
-                    }
-                    Message = Message + line + "\n";
-                }
-             String totalMessage = Arrays.toString(Message.split("(?<=\\G.{9})"));
-            //utils.sendEmbed(channel, author, "cmd", "cmd", "```html\n" + Message + "```");
-            if (!Message.isEmpty()) {
-                    while(Message.length() > 1989) {
-                        String Msg2 = Message.substring(0,1989);
-                        Message = Message.substring(1989);
-                        channel.sendMessage("```html\n" + Msg2 + "```").queue();
-
-                    }
-               if(Message.length()<1989) {
-                        channel.sendMessage("```html\n" + Message + "```").queue();
-               }
+            if(Config.isDebugMode()) {
+                System.out.println(commands);
             }
 
+            ProcessBuilder builder = new ProcessBuilder(commands).redirectErrorStream(true);
+            Process process = builder.start();
+            ExecutorService threadPool = Executors.newFixedThreadPool(1);
+            Future<String> output = threadPool.submit(() -> CommandUtils.readStream(process.getInputStream()));
+
+            threadPool.shutdown();
+
+            if (!process.waitFor(Config.getCommandTimeout(), TimeUnit.MILLISECONDS)) {
+                output.cancel(true);
+                process.destroy();
+                process.waitFor();
+                channel.sendMessage("Command `" + String.join(" ", args) + "` timed out.").queue();
+                return;
+            }
+
+            String message = output.get();
+            //utils.sendEmbed(channel, author, "cmd", "cmd", "```html\n" + Message + "```");
+
+            if (!message.isEmpty()) {
+                while (message.length() > 1989) {
+                    String msg2 = message.substring(0, 1989);
+                    message = message.substring(1989);
+                    channel.sendMessage("```html\n" + msg2 + "```").queue();
+                }
+                if (message.length() < 1989) {
+                    channel.sendMessage("```html\n" + message + "```").queue();
+                }
+            }
         } catch (Exception e) {
             e.printStackTrace();
-            event.getChannel().sendMessage("We couldn't run: " + String.join(" ", args) + " ***Exception:*** " + e.toString() ).queue();
+            event.getChannel().sendMessage("We couldn't run `" + String.join(" ", args) + "`\n\n***Exception:*** " + e.toString()).queue();
         }
     }
 }

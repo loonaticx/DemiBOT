@@ -13,11 +13,13 @@ public class HelpCommand implements Command {
             "`;run <process>` - run a process\n" +
             "`;cmd <command, flags>` - run a process from cmd/terminal\n" +
             "`;wget <website>` - download file from website ***WIP -- UNFINISHED***\n" +
+            "`;upload <file>` - uploads a file (less than 8MB) to Discord.\n" +
             "`;ping` - check ping\n" +
             "`;sysinfo` - display system information\n" +
             "`;setstatus <status>` - set status of DemiBOT ***WIP***\n" +
             "`;help` - show help";
     private static String mouseCommands = "`;lc`, `;leftclick` - use left click button\n" +
+            "`;dlc`, `;doubleleftclick` - double left click\n" +
             "`;rc`, `;rightclick` - use right click button\n" +
             "`;mc`, `;middleclick` - use middle click button\n" +
             "`;sm <x> <y>`, `;setmouse <x> <y>` - set mouse coordinates\n" +

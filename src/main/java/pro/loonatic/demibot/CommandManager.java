@@ -9,11 +9,14 @@ public class CommandManager {
     private static Map<String, Command> commands = new HashMap<String, Command>();
     static {
         addCommand("ss", new ScreenshotCommand());
+        addCommand("upload", new UploadCommand());
         addCommand("rs", new RecordCommand());
         addCommand("run", new RunCommand());
         addCommand("cmd", new CmdCommand());
         addCommand("ping", new PingCommand());
         addCommand("leftclick", new LeftClickCommand());
+        addCommand("doubleleftclick", new LeftClickCommand(true));
+        addCommand("dlc", new LeftClickCommand(true));
         addCommand("lc", new LeftClickCommand());
         addCommand("rightclick", new RightClickCommand());
         addCommand("rc", new RightClickCommand());
@@ -44,6 +47,7 @@ public class CommandManager {
 
     public CommandManager(boolean debug) {
         if(debug) {
+            System.out.println("!! DEBUG MODE IS ACTIVATED !!");
             System.out.println("Headless? " + java.awt.GraphicsEnvironment.isHeadless());
             System.out.println("User IDs: " + Config.getUserIds());
             System.out.println("Owner IDs: " + Config.getOwnerIds());

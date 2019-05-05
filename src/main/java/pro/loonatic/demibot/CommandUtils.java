@@ -27,6 +27,8 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
+import static pro.loonatic.demibot.Config.isDebugMode;
+
 public class CommandUtils {
     public static final String OpSystem = System.getProperty("os.name");
     public static final boolean isWindows = OpSystem.toLowerCase().contains("win");
@@ -67,7 +69,6 @@ public class CommandUtils {
         }
 
         exePaths.put("ffmpeg", "./ffmpeg.exe");
-        exePaths.put("ffprobe", "./ffprobe.exe");
         exePaths.put("nircmd", "./nircmd.exe");
         exePaths.put("wget", "./wget.exe");
 
@@ -94,6 +95,14 @@ public class CommandUtils {
     private static final DateFormat hourFormat = new SimpleDateFormat("hh:mm a");
 
     public CommandUtils() {
+    }
+
+    public static String readStream(InputStream stream) {
+        Scanner scanner = new Scanner(stream).useDelimiter("\\A");
+        String result = scanner.hasNext() ? scanner.next() : "";
+
+        scanner.close();
+        return result;
     }
 
     public static void typeString(Robot robot, String str) {
@@ -153,6 +162,25 @@ public class CommandUtils {
         return sendScreenshot(event.getChannel());
     }
 
+    public static boolean sendFile(MessageChannel channel, String args) {
+
+        String file = args.substring(1, args.length() -1);
+        try {
+            File sFile = Config.getDirectFile("downloads", file);
+            channel.sendFile(sFile).queue();
+            return true;
+        } catch (Exception e) {
+            if (isDebugMode()) {
+                e.printStackTrace();
+            }
+            return false;
+        }
+    }
+
+    public static boolean sendFile(MessageReceivedEvent event, String args) {
+        return sendFile(event.getChannel(), args);
+    }
+
     public static Image getScreenshot() {
         try {
             return ImageIO.read(Config.getDirectFile("output", "ss.png"));
@@ -210,7 +238,7 @@ public class CommandUtils {
         command.add("/P");
         command.add(link);
         System.out.println(link);
-        command.add(String.format("\"%s\"", Config.getDirectFolder("wget")));
+        command.add(String.format("\"%s\"", Config.getDirectFolder("downloads")));
         System.out.println(command);
         ProcessBuilder pb = new ProcessBuilder(command);
     }

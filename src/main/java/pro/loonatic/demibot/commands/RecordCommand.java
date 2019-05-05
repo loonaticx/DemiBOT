@@ -7,6 +7,7 @@ import pro.loonatic.demibot.CommandUtils;
 import java.awt.*;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static pro.loonatic.demibot.CommandUtils.FileCheck;
@@ -20,6 +21,7 @@ public class RecordCommand implements Command {
 
     public void process(MessageReceivedEvent event, List<String> args) throws Exception {
 
+        //ngl, we can use Arrays.AsList here instead of this stupid for each loop crap
 
         MessageChannel channel = event.getChannel();
         ArrayList<String> AudioRecord = new ArrayList<String>();

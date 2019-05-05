@@ -14,7 +14,6 @@ public class ConfigSetup {
     }
     public JSONObject setup(JSONObject object) throws IOException {
         while(!object.isEmpty()) {
-
         }
 
         return object;
