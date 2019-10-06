@@ -1,0 +1,13 @@
+
+.idea/*
+./out/*
+.gradle/*
+out/production/classes/*
+out/production/resources/*
+out/production/*
+out/*
+gradle/*
+build/*
+gradlew
+gradlew.bat
+ss.png
