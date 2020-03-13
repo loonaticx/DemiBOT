@@ -36,6 +36,7 @@ public class CommandManager {
         addCommand("h", new HelpCommand());
         addCommand("wget", new WGetCommand());
         addCommand("setstatus", new StatusCommand());
+        //addCommand("chava", new AvatarCommand());
         //addCommand("gitpush", new );
         addCommand("chava", new AvatarCommand()); //gay boy dun work
         try {

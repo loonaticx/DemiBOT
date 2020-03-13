@@ -12,6 +12,13 @@ public class AvatarCommand implements Command {
     public void process(MessageReceivedEvent event, List<String> args) throws Exception {
         User author = event.getAuthor();
         //File f = new File("path/to/" + args);
-        Main.jda.getSelfUser().getManager().setAvatar(Icon.from(new File("path/to/file.jpg")));
+        if(args.size() < 1) {
+            return;
+        }
+        try {
+            Main.jda.getSelfUser().getManager().setAvatar(Icon.from(new File(args.get(0))));
+        } catch(IllegalArgumentException e) {
+
+        }
     }
 }

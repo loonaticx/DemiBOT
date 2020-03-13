@@ -66,13 +66,13 @@ public class CmdCommand implements Command {
             //utils.sendEmbed(channel, author, "cmd", "cmd", "```html\n" + Message + "```");
 
             if (!message.isEmpty()) {
-                while (message.length() > 1989) {
-                    String msg2 = message.substring(0, 1989);
-                    message = message.substring(1989);
-                    channel.sendMessage("```html\n" + msg2 + "```").queue();
+                while (message.length() > 1995) {
+                    String msg2 = message.substring(0, 1995);
+                    message = message.substring(1995);
+                    channel.sendMessage(">>> " + msg2 + "").queue();
                 }
-                if (message.length() < 1989) {
-                    channel.sendMessage("```html\n" + message + "```").queue();
+                if (message.length() < 1995) {
+                    channel.sendMessage(">>> " + message + "").queue();
                 }
             }
         } catch (Exception e) {

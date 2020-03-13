@@ -165,6 +165,10 @@ public class CommandUtils {
     public static boolean sendFile(MessageChannel channel, String args) {
 
         String file = args.substring(1, args.length() -1);
+        //String file = args;
+        if(isDebugMode()) {
+            System.out.println("[Upload] File trying to be sent: " + file);
+        }
         try {
             File sFile = Config.getDirectFile("downloads", file);
             channel.sendFile(sFile).queue();

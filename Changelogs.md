@@ -3,6 +3,21 @@
 *DemiBOT is still undergoing alpha production. Some features may not be complete and could possibly be a bit buggy. If you'd like to contribute or send me a bug report, you can DM me on Discord @ loonatic#1337 . Please note that not everything is final, and could possibly change in the next update!*
 
 ## *Current Version:* 1.2.9 ALPHA
+
+### 1.2.9 ALPHA Notes - 3/13/2020
+#### "Reluctant Revival"
+* +Prefix may now be more than one character long, so a prefix of ";12" is now allowed.
+* +Added a prototype menu for sysinfo. Check it out using `;sysinfo storage`
+* ! Note: There are still a bunch of missing features on DemiBOT. I'll implement them sometime in the future when I'm confident enough. Thanks for understanding :-)
+
+**Work in progress list:**
+* Change avatar command (;chava)
+* Concise menus for different areas in ;sysinfo
+* Change status via command and/or json config
+* Refining ;help. It's missing some things. I know.
+* ;upload failing to upload response
+* And like... a million other things :]
+
 ### 1.2.9 ALPHA Notes - 5/4/2019
 #### "May The 4th Be With You"
 * +Added threadpooling - this means that DemiBOT can run up to eight commands at the same time, if the other commands take lot of time to process.

@@ -130,7 +130,7 @@ class MessageListener extends ListenerAdapter {
             return;
         }
 
-        msg = msg.substring(1);
+        msg = msg.substring(Config.getPrefix().length());
         List<String> args = new ArrayList<String>(Arrays.asList(msg.split(" ")));
         Command command = CommandManager.getCommand(args.get(0));
 
