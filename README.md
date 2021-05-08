@@ -1,8 +1,8 @@
 ![alt text](img/demibot-header.png)
 
 DemiBOT is an amazing remote control Discord bot, created by the infamous Loonatic and Disyer.\
-[Click me for more info!](https://github.com/toontownloony/DemiBOT/blob/master/Info.md)\
-[Changelogs](https://github.com/toontownloony/DemiBOT/blob/master/Changelogs.md)
+[Click me for more info!](https://github.com/loonaticx/DemiBOT/blob/master/Info.md)\
+[Changelogs](https://github.com/loonaticx/DemiBOT/blob/master/Changelogs.md)
 
 # Features
 ![alt text](img/demo-0.gif "Epic Screenshotting Feature!")
