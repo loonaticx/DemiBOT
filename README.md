@@ -1,14 +1,14 @@
-![alt text](http://i.loony.pw/demibot-header.png)
+![alt text](img/demibot-header.png)
 
 DemiBOT is an amazing remote control Discord bot, created by the infamous Loonatic and Disyer.\
 [Click me for more info!](https://github.com/toontownloony/DemiBOT/blob/master/Info.md)\
 [Changelogs](https://github.com/toontownloony/DemiBOT/blob/master/Changelogs.md)
 
 # Features
-![alt text](http://i.loony.pw/2019-01-14_19-43-38.gif "Epic Screenshotting Feature!")
-![alt text](http://i.loony.pw/Discord_2019-01-14_19-44-58.png "Playing Overwatch")
-![alt text](http://i.loony.pw/Discord_2019-01-14_19-45-23.png "System Information")
-![alt text](http://i.loony.pw/Discord_2019-01-14_19-47-49.png "Help")
+![alt text](img/demo-0.gif "Epic Screenshotting Feature!")
+![alt text](img/demo-1.png "Playing Overwatch")
+![alt text](img/demo-2.png "System Information")
+![alt text](img/demo-3.png "Help")
 
 # Dependencies:
 * Gradle
