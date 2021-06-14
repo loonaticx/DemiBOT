@@ -10,3 +10,5 @@ gradle/*
 gradlew
 gradlew.bat
 ss.png
+downloads/*
+*.class

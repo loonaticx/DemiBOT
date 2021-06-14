@@ -1,8 +1,8 @@
 package pro.loonatic.demibot.commands;
 
-import net.dv8tion.jda.core.entities.Icon;
-import net.dv8tion.jda.core.entities.User;
-import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.entities.Icon;
+import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import pro.loonatic.demibot.Main;
 
 import java.io.File;

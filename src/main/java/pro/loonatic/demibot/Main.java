@@ -1,10 +1,11 @@
 package pro.loonatic.demibot;
 
+import net.dv8tion.jda.api.managers.Presence;
 import pro.loonatic.demibot.commands.Command;
-import net.dv8tion.jda.core.*;
-import net.dv8tion.jda.core.entities.*;
-import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
-import net.dv8tion.jda.core.hooks.ListenerAdapter;
+import net.dv8tion.jda.api.*;
+import net.dv8tion.jda.api.entities.*;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
 import javax.security.auth.login.LoginException;
 import java.io.FileNotFoundException;
@@ -46,17 +47,21 @@ public class Main {
         new CommandManager(debug);
 
         try {
-            jda = new JDABuilder(AccountType.BOT)
-                    .setToken(getBotToken())
-                    .addEventListener(new MessageListener())
-                    .buildBlocking();
+            JDA jda = JDABuilder.createDefault(Config.getBotToken()).addEventListeners(new MessageListener()).build();
         } catch (LoginException e) {
-            e.printStackTrace();
-        } catch (InterruptedException e) {
             e.printStackTrace();
         }
         System.out.println("Connected");
-        jda.getPresence().setGame(Game.streaming("on " + System.getProperty("os.name"), "https://twitch.tv/loonatricks"));
+        try {
+            Presence p = jda.getPresence();
+            p.setActivity(Activity.playing(("on " + System.getProperty("os.name"))));
+
+        } catch (NullPointerException e) {
+            System.out.println("Failed to get presence.");
+            if(isDebugMode()) {
+                e.printStackTrace();
+            }
+        }
         //jda.getPresence().setStatus(OnlineStatus.DO_NOT_DISTURB);
     }
 }
@@ -86,16 +91,18 @@ class MessageListener extends ListenerAdapter {
     public void onMessageReceived(MessageReceivedEvent event) {
         User author = event.getAuthor();
         Guild guild = event.getGuild();
-        Channel channel = event.getTextChannel();
+        TextChannel channel = event.getTextChannel();
         List<Role> role = guild.getRoles();
         //System.out.println("roles : " + Arrays.asList(role));
-        PrivateChannel privateChannel = event.getPrivateChannel();
 
         if(isDebugMode()) {
+            PrivateChannel privateChannel = event.getPrivateChannel();
+
             if(!isOwner(author)) {
                 System.out.println("TRUSTED? " + author + " " + isTrustedUser(author));
                 return;
             }
+
             try {
                 if (privateChannel.getType().toString().equals("PRIVATE")) {
                     System.out.println("Channel Type: " + privateChannel.getType());

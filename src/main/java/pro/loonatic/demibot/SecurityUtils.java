@@ -1,6 +1,6 @@
 package pro.loonatic.demibot;
 
-import net.dv8tion.jda.core.entities.*;
+import net.dv8tion.jda.api.entities.*;
 
 import java.util.List;
 
@@ -14,7 +14,7 @@ public class SecurityUtils{
         return Config.getServerIds().contains(guild.getId()) || Config.getServerIds().contains("any");
     }
 
-    public static boolean isTrustedChannel(Channel channel) {
+    public static boolean isTrustedChannel(TextChannel channel) {
         return Config.getChannelIds().contains(channel.getId()) || Config.getServerIds().contains("any");
     }
     public static boolean isTrustedRole(List<Role> role) {
